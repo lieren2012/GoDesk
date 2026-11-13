@@ -2,12 +2,12 @@
 
 > 一款面向 Windows、Linux、macOS 与 Android 的现代远程设备工作台。
 
-[![Windows 构建](https://github.com/lieren2012/GoDesk/actions/workflows/godesk-windows.yml/badge.svg)](https://github.com/lieren2012/GoDesk/actions/workflows/godesk-windows.yml)
+[![平台构建](https://github.com/lieren2012/GoDesk/actions/workflows/godesk-windows.yml/badge.svg)](https://github.com/lieren2012/GoDesk/actions/workflows/godesk-windows.yml)
 [![许可证：GPL-3.0](https://img.shields.io/badge/license-GPL--3.0-blue.svg)](LICENSE)
 
 GoDesk 基于 [RabbitRemoteControl](https://github.com/KangLin/RabbitRemoteControl) 重构，保留原项目成熟的多协议和插件架构，逐步改造桌面端的视觉、更新和使用体验。
 
-当前仓库优先提供 Windows 客户端。构建、安装包和自动更新链路都放在 GitHub Actions 中完成，便于每次提交都能追踪构建结果。
+第一版构建目标是 Windows x64、macOS Intel、macOS Apple Silicon 和 Linux x64。构建、安装包和自动更新链路都放在 GitHub Actions 中完成；Android/手机版暂不纳入这一版。
 
 [English README](README_en.md) · [页面原型](docs/ui/godesk-dashboard.html) · [构建记录](https://github.com/lieren2012/GoDesk/actions)
 
@@ -53,7 +53,7 @@ GoDesk 客户端启动后会在后台检查 GitHub Release：
 
 ### GitHub Actions
 
-推送到 `main` 分支，或在仓库的 Actions 页面手动运行 **GoDesk Windows client** 工作流。工作流会编译官方矩阵中的 Windows 版本，并在 x64 构建成功后发布 `nightly` 安装包。
+推送到 `main` 分支，或在仓库的 Actions 页面手动运行 **GoDesk platform builds** 工作流。工作流会分别编译 Windows x64、macOS Intel/Apple Silicon 和 Linux x64；Windows x64 构建成功后发布 `nightly` 安装包。
 
 ### 本地命令（仅用于开发调试）
 
