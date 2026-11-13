@@ -25,6 +25,13 @@
 #include <QCommandLineParser>
 #include <QTimer>
 #include <QUrl>
+#include <QVBoxLayout>
+#include <QHBoxLayout>
+#include <QPushButton>
+#include <QToolButton>
+#include <QStyle>
+#include <QFrame>
+#include <QListWidgetItem>
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -89,7 +96,8 @@ MainWindow::MainWindow(QWidget *parent)
     bool check = false;
 
     ui->setupUi(this);
-    setWindowTitle(qApp->applicationDisplayName());
+    setWindowTitle(QStringLiteral("GoDesk"));
+    setWindowIcon(QIcon(QStringLiteral(":/images/app")));
     setMinimumSize(QSize(900, 600));
     resize(QSize(1180, 760));
 
@@ -110,8 +118,29 @@ MainWindow::MainWindow(QWidget *parent)
         QSplitter::handle { background: #e6ebf2; }
         QTabBar::tab { background: #eef2f7; color: #64748b; padding: 8px 14px; border: 0; border-radius: 7px; margin: 2px; }
         QTabBar::tab:selected { background: #2f6df6; color: #ffffff; }
+        QWidget#welcomePanel { background: #f4f7fb; }
+        QLabel#welcomeTitle { color: #12213d; font-size: 28px; font-weight: 700; }
+        QLabel#welcomeSubtitle { color: #6b7a90; font-size: 14px; }
+        QFrame#welcomeCard { background: #ffffff; border: 1px solid #e2e9f3; border-radius: 14px; }
+        QLabel#welcomeSection { color: #1d2d4a; font-size: 15px; font-weight: 600; }
+        QListWidget#welcomeRecent { background: transparent; border: 0; color: #26364f; outline: 0; }
+        QListWidget#welcomeRecent::item { padding: 10px 12px; border-radius: 8px; }
+        QListWidget#welcomeRecent::item:hover { background: #edf3ff; }
+        QPushButton#welcomePrimary, QToolButton#welcomePrimary { background: #2f6df6; color: #ffffff; border: 0; border-radius: 8px; padding: 10px 18px; font-weight: 600; }
+        QPushButton#welcomePrimary:hover, QToolButton#welcomePrimary:hover { background: #245de0; }
+        QPushButton#welcomeSecondary { background: #ffffff; color: #245de0; border: 1px solid #c9d8f4; border-radius: 8px; padding: 10px 18px; }
+        QPushButton#welcomeSecondary:hover { background: #edf3ff; }
     )");
     ui->menubar->show();
+    ui->toolBar->setMovable(false);
+    ui->toolBar->setFloatable(false);
+    ui->toolBar->setIconSize(QSize(20, 20));
+    ui->toolBar->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+    ui->actionOpenListRecent->setIcon(style()->standardIcon(QStyle::SP_FileDialogContentsView));
+    ui->actionOpenRRCFile->setIcon(style()->standardIcon(QStyle::SP_DialogOpenButton));
+    ui->actionFull_screen_F->setIcon(style()->standardIcon(QStyle::SP_TitleBarMaxButton));
+    ui->actionSettings->setIcon(style()->standardIcon(QStyle::SP_FileDialogDetailedView));
+    ui->actionExit_E->setIcon(style()->standardIcon(QStyle::SP_TitleBarCloseButton));
 
     //!\~chinese 当有停泊条且视图类型改变时，使用一个容器窗口，防止视图窗口大小发生改变。
     //!\~english
@@ -653,19 +682,23 @@ void MainWindow::SetView(CView* pView)
         QLayoutItem* item;
         while ((item = pOldLayout->takeAt(0)) != nullptr) {
             if (item->widget()) {
-                item->widget()->deleteLater();
+                if(item->widget() != m_pWelcome)
+                    item->widget()->deleteLater();
             }
             delete item;
         }
         delete pOldLayout;
     }
-    auto* pLayout = new QVBoxLayout(pContain);
-    if(pLayout) {
-        pLayout->setContentsMargins(0, 0, 0, 0);
-        pLayout->setSpacing(0);
-        pContain->setLayout(pLayout);
-        pLayout->addWidget(m_pView);
-    }
+    if(!m_pWelcome)
+        CreateWelcomePanel(pContain);
+    m_pCentralStack = new QStackedLayout(pContain);
+    m_pCentralStack->setContentsMargins(0, 0, 0, 0);
+    m_pCentralStack->setSpacing(0);
+    pContain->setLayout(m_pCentralStack);
+    m_pCentralStack->addWidget(m_pView);
+    if(m_pWelcome)
+        m_pCentralStack->addWidget(m_pWelcome);
+    ShowWelcomePanel(m_Operates.isEmpty());
 
     bool check = false;
     //m_pView->setFocusPolicy(Qt::NoFocus);
@@ -698,6 +731,94 @@ void MainWindow::SetView(CView* pView)
         }
     }
     m_pView->SetVisibleTab(m_Parameter.GetTabBar());
+}
+
+void MainWindow::CreateWelcomePanel(QWidget* parent)
+{
+    if(m_pWelcome || !parent)
+        return;
+
+    m_pWelcome = new QWidget(parent);
+    m_pWelcome->setObjectName("welcomePanel");
+    auto* root = new QVBoxLayout(m_pWelcome);
+    root->setContentsMargins(56, 44, 56, 44);
+    root->setSpacing(0);
+
+    auto* title = new QLabel(tr("Welcome to GoDesk"), m_pWelcome);
+    title->setObjectName("welcomeTitle");
+    root->addWidget(title);
+    auto* subtitle = new QLabel(tr("Connect to your computers and devices from one clean workspace."), m_pWelcome);
+    subtitle->setObjectName("welcomeSubtitle");
+    subtitle->setWordWrap(true);
+    root->addSpacing(8);
+    root->addWidget(subtitle);
+
+    auto* actions = new QHBoxLayout();
+    actions->setSpacing(10);
+    actions->setContentsMargins(0, 26, 0, 0);
+    auto* start = new QToolButton(m_pWelcome);
+    start->setObjectName("welcomePrimary");
+    start->setText(tr("New connection"));
+    start->setToolButtonStyle(Qt::ToolButtonTextOnly);
+    start->setPopupMode(QToolButton::InstantPopup);
+    start->setMenu(ui->menuStart);
+    actions->addWidget(start, 0, Qt::AlignLeft);
+    auto* open = new QPushButton(tr("Open connection file"), m_pWelcome);
+    open->setObjectName("welcomeSecondary");
+    connect(open, &QPushButton::clicked, this, &MainWindow::on_actionOpenRRCFile_triggered);
+    actions->addWidget(open, 0, Qt::AlignLeft);
+    actions->addStretch(1);
+    root->addLayout(actions);
+
+    auto* card = new QFrame(m_pWelcome);
+    card->setObjectName("welcomeCard");
+    auto* cardLayout = new QVBoxLayout(card);
+    cardLayout->setContentsMargins(20, 18, 20, 14);
+    cardLayout->setSpacing(8);
+    auto* section = new QLabel(tr("Recent connections"), card);
+    section->setObjectName("welcomeSection");
+    cardLayout->addWidget(section);
+    m_pWelcomeRecent = new QListWidget(card);
+    m_pWelcomeRecent->setObjectName("welcomeRecent");
+    m_pWelcomeRecent->setMinimumHeight(180);
+    m_pWelcomeRecent->setSelectionMode(QAbstractItemView::SingleSelection);
+    connect(m_pWelcomeRecent, &QListWidget::itemDoubleClicked, this,
+            [this](QListWidgetItem* item) {
+                if(item)
+                    slotOpenFile(item->data(Qt::UserRole).toString());
+            });
+    cardLayout->addWidget(m_pWelcomeRecent);
+    root->addSpacing(28);
+    root->addWidget(card);
+    root->addStretch(1);
+    RefreshWelcomeHistory();
+}
+
+void MainWindow::RefreshWelcomeHistory()
+{
+    if(!m_pWelcomeRecent || !m_pRecent)
+        return;
+    m_pWelcomeRecent->clear();
+    const auto recents = m_pRecent->GetRecents(m_Parameter.GetRecentMenuMaxCount());
+    for(auto it = recents.crbegin(); it != recents.crend(); ++it) {
+        auto* item = new QListWidgetItem(it->icon, it->szName, m_pWelcomeRecent);
+        item->setData(Qt::UserRole, it->GetFile());
+        item->setToolTip(it->GetFile());
+    }
+    if(m_pWelcomeRecent->count() == 0) {
+        auto* empty = new QListWidgetItem(tr("No recent connections yet. Double-click a saved connection to open it."), m_pWelcomeRecent);
+        empty->setFlags(Qt::NoItemFlags);
+        empty->setForeground(QColor("#8a98ad"));
+    }
+}
+
+void MainWindow::ShowWelcomePanel(bool show)
+{
+    if(!m_pCentralStack || !m_pWelcome || !m_pView)
+        return;
+    m_pCentralStack->setCurrentWidget(show ? m_pWelcome : m_pView);
+    if(show)
+        RefreshWelcomeHistory();
 }
 
 void MainWindow::on_actionViewTab_triggered()
@@ -1195,6 +1316,7 @@ int MainWindow::Start(COperate *pOperate, bool set, QString szFile)
         item.SetFile(szFile);
         item.time = QDateTime::currentDateTime();
         m_pRecent->AddRecent(item);
+        RefreshWelcomeHistory();
     }
     
     if(!pOperate->Name().isEmpty())
@@ -1234,6 +1356,7 @@ int MainWindow::Start(COperate *pOperate, bool set, QString szFile)
         Q_ASSERT(check);
     }
     m_Operates.insert(pOperate);
+    ShowWelcomePanel(false);
     StartTimer();
 
     m_pFrmActive->slotLoad();
@@ -1380,11 +1503,14 @@ void MainWindow::slotFinished()
         }
     }
     if(m_Operates.isEmpty())
+    {
+        ShowWelcomePanel(true);
         if(m_pActionOperateMenu) {
             ui->menuTools->removeAction(m_pActionOperateMenu);
             ui->toolBar->removeAction(m_pActionOperateMenu);
             m_pActionOperateMenu = nullptr;
         }
+    }
 
     StartTimer();
 }

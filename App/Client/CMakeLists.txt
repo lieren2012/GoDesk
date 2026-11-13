@@ -114,6 +114,12 @@ ADD_TARGET(NAME ${PROJECT_NAME}
     PRIVATE_LIBS Plugin ${QT_LIBRARIES}
     )
 
+if(WIN32)
+    # Keep the implementation target name for compatibility while exposing a
+    # branded executable to Windows users and installers.
+    set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "GoDesk")
+endif()
+
 # Install other files
 set(OTHER_FILES
     ${CMAKE_SOURCE_DIR}/License.md

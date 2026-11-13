@@ -123,7 +123,7 @@ int main(int argc, char *argv[])
 #endif
 
     QApplication::setApplicationVersion(RabbitRemoteControl_VERSION);
-    QApplication::setApplicationName("RabbitRemoteControl");
+    QApplication::setApplicationName("GoDesk");
 #if QT_VERSION >= QT_VERSION_CHECK(5, 7, 0)
     QApplication::setDesktopFileName(QLatin1String("io.github.KangLin.RabbitRemoteControl.desktop"));
 #endif

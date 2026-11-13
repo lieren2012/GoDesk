@@ -12,6 +12,8 @@
 #include <QDockWidget>
 #include <QSystemTrayIcon>
 #include <QLabel>
+#include <QListWidget>
+#include <QStackedLayout>
 
 #include "RecentDatabase.h"
 #include "View.h"
@@ -178,6 +180,12 @@ protected:
 private:
     Ui::MainWindow *ui;
     CView* m_pView;
+    QWidget* m_pWelcome = nullptr;
+    QListWidget* m_pWelcomeRecent = nullptr;
+    QStackedLayout* m_pCentralStack = nullptr;
+    void CreateWelcomePanel(QWidget* parent);
+    void RefreshWelcomeHistory();
+    void ShowWelcomePanel(bool show);
     QAction* m_pToolBarMenuAction;
     void EnableMenu(bool bEnable);
 
