@@ -22,6 +22,7 @@
 #include <QtGlobal>
 #include <QSharedPointer>
 #include <QException>
+#include <QUrl>
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     #include <QRegularExpression>
 #endif
@@ -178,8 +179,17 @@ int main(int argc, char *argv[])
         ShowMessageInSplashScreen(QObject::tr("Start") + " ......");
 
 #ifdef HAVE_UPDATE
-        // Check update version
-        QScopedPointer<CFrmUpdater> pUpdater(new CFrmUpdater());
+        // The updater's command-line generator is used by CI when it passes
+        // -f/--file. Normal launches must skip it; the interactive check is
+        // started asynchronously by MainWindow after startup.
+        const QStringList args = app.arguments();
+        const bool generateUpdate = args.contains("-f") || args.contains("--file");
+        QScopedPointer<CFrmUpdater> pUpdater;
+        if(generateUpdate) {
+            QVector<QUrl> updateUrls;
+            updateUrls << QUrl("https://github.com/lieren2012/GoDesk/releases/download/nightly/update.json");
+            pUpdater.reset(new CFrmUpdater(updateUrls));
+        }
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
         if(qEnvironmentVariable("SNAP").isEmpty()
             && qEnvironmentVariable("FLATPAK_ID").isEmpty())
@@ -187,6 +197,7 @@ int main(int argc, char *argv[])
         if(qgetenv("SNAP").isEmpty()
             && qgetenv("FLATPAK_ID").isEmpty())
 #endif
+        if(generateUpdate)
         {
             if(pUpdater) {
                 pUpdater->setAttribute(Qt::WA_DeleteOnClose, false);
