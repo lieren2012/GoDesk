@@ -1,285 +1,101 @@
-# <img src="App/Client/Resource/Image/io.github.KangLin.RabbitRemoteControl.png" width="48" height="48" />[Rabbit Remote Control](https://github.com/KangLin/RabbitRemoteControl)
+# GoDesk
 
-Author: Kang Lin <kl222@126.com>
+> 一款面向 Windows、Linux、macOS 与 Android 的现代远程设备工作台。
 
------------------------------------------------------------------------
+[![Windows 构建](https://github.com/lieren2012/GoDesk/actions/workflows/godesk-windows.yml/badge.svg)](https://github.com/lieren2012/GoDesk/actions/workflows/godesk-windows.yml)
+[![许可证：GPL-3.0](https://img.shields.io/badge/license-GPL--3.0-blue.svg)](LICENSE)
 
-[:cn: 中文](README_zh_CN.md)
+GoDesk 基于 [RabbitRemoteControl](https://github.com/KangLin/RabbitRemoteControl) 重构，保留原项目成熟的多协议和插件架构，逐步改造桌面端的视觉、更新和使用体验。
 
------------------------------------------------------------------------
+当前仓库优先提供 Windows 客户端。构建、安装包和自动更新链路都放在 GitHub Actions 中完成，便于每次提交都能追踪构建结果。
 
-- [Introduction](#Introduction)
-  + [Screenshot](#Screenshot)
-    - [Multiple style](#Multiple-style)
-  + [Project repository position](#Project-repository-position)
-- [Functions](#Functions)
-  + [Supported operating system](#Supported-operating-system)
-  + [Supported multiple languages](#Supported-multiple-languages)
-  + [Supported protocols](#Supported-protocols)
-    - [Remote control protocols](#Remote-control-protocols)
-    - [Network protocols](#Network-protocols)
-  + [Function list](#Function-list)
-  + [Plugins](#Plugins)
-- [Status](#Status)
-- [Sponsorship and Donations](#Sponsorship-and-Donations)
-- [Contribution](#Contribution)
-- [Download](#Download)
-- [Development](#Development)
-  + [Compilation](#Compilation)
-    - [Compiling for Linux](docs/Compile/Linux.md)
-    - [Compiling for Windows](docs/Compile/Windows.md)
-- [License Agreement](#License-Agreement)
+[English README](README_en.md) · [页面原型](docs/ui/godesk-dashboard.html) · [构建记录](https://github.com/lieren2012/GoDesk/actions)
 
------------------------------------------------------------------------
+## 界面预览
 
-## Introduction
+![GoDesk 主界面参考](docs/Image/Screenshot/MainWindows.png)
 
-**Rabbit Remote Control** is an open-source, cross-platform, multi-protocol remote control software.
+第一版界面采用清爽的浅色工作台、深色导航和蓝色主操作色。连接列表、最近记录、收藏和运行中的会话仍沿用原有功能，后续会逐步替换为 GoDesk 的统一交互。
 
-**Allows you to use any device and system from anywhere and remotely manage any device and system in any way**. 
+## 主要能力
 
-Its goal is to be simple, convenient, secure and easy to use, improving work efficiency.
+- **远程桌面**：VNC / RFB、RDP
+- **远程终端**：SSH、Telnet、本地终端和串口
+- **文件与网络工具**：FTP、SFTP、局域网唤醒、网页浏览器等
+- **多种工作区布局**：标签页、分屏、停靠面板和最近连接
+- **插件化架构**：协议和工具可以独立扩展，不把所有功能堆在主窗口里
+- **跨平台基础**：Windows、Linux、macOS、Android（Android 版本仍需实机验证）
+- **多语言**：默认中文，同时保留英文及其他翻译资源
 
-It includes remote desktop, remote control, file transfer (FTP, SFTP), terminal, remote terminal (SSH, Telnet), player, network tools, and more.
+## 下载与自动更新
 
-### Screenshot
+Windows 客户端由 GitHub Actions 编译。进入 [Actions](https://github.com/lieren2012/GoDesk/actions) 查看构建状态，成功构建后可在对应的 `nightly` Release 下载测试安装包。
 
-|Main window|Recent list menu|Connect|Work|Termux|
-|--|--|--|--|--|
-|![Main window](docs/Image/Screenshot/MainWindows_en.png)|![Recent list menu](docs/Image/Screenshot/RecentMenu_en.png)|![Connect](docs/Image/Screenshot/Connect_en.png)|![Work](docs/Image/Screenshot/Work_en.png)|![Termux](docs/Image/Screenshot/Termux.jpg)|
+GoDesk 客户端启动后会在后台检查 GitHub Release：
 
-#### Multiple style
+1. 读取当前平台对应的更新清单；
+2. 发现新版本后下载安装包并校验 MD5；
+3. 下载完成后弹出更新窗口，由用户确认是否启动安装程序。
 
-|Default style|Black-Green style|Black style|White style|
-|:-------:|:------:|:-------:|:------:|
-|![Default style](docs/Image/Screenshot/DefaultStyle.png)|![Black-Green style](docs/Image/Screenshot/Green.png)|![Black](docs/Image/Screenshot/black.png)|![White](docs/Image/Screenshot/white.png)|
+更新不会静默替换正在运行的程序。正式发布前会继续完善版本号、签名和回滚策略。
 
-### Project repository position
+## 从源码编译
 
-- Main repository: https://github.com/KangLin/RabbitRemoteControl
-- Mirror repository:
-  - sourceforge: https://sourceforge.net/projects/rabbitremotecontrol/
-  - codeberg: https://codeberg.org/KangLin/RabbitRemoteControl
-  - gitlab: https://gitlab.com/kl222/RabbitRemoteControl
-  - launchpad: https://launchpad.net/rabbitremotecontrol
-  - gitee: https://gitee.com/kl222/RabbitRemoteControl
-  - bitbucket: https://bitbucket.org/kl222/rabbitremotecontrol
-
-## Functions
-
-### Supported operating system
-
-- [x] Windows 7 SP1 and later
-- [x] Unix/Linux
-- [x] [Android](https://doc.qt.io/qt-6/android.html)
-- [x] [Termux](https://github.com/termux)
-- [x] macOS
-
-See: [Qt5](https://doc.qt.io/qt-5/supported-platforms.html),
-[Qt6](https://doc.qt.io/qt-6/supported-platforms.html)
-
-I do not have Mac devices, so I did not compile and test. Please test by yourself if you have Mac devices.
-Interested and capable friends are welcome to participate in the development of the project.
-
-If you want to donate the development devices to me, please contact: (email: kl222@126.com)
-
-- Remote desktop
-
-|        |Windows|Unix/Linux|Android|Termux|macOS |
-|--------|:-----:|:--------:|:-----:|:----:|:----:|
-|vnc     |✓      |✓         |✓      |✓     |✓     |
-|RDP     |✓      |✓         |✓      |✓     |✓     |
-|Spice   |       |          |       |      |      |
-|Scrcpy  |       |          |       |      |      |
-
-- Terminal
-
-|             |Windows|Unix/Linux|Android|macOS|
-|-------------|-------|----------|-------|-----|
-|Terminal     |✓      |✓         |❌     |✓    |
-|SSH          |✓      |✓         |❌     |✓    |
-|TELNET       |✓      |✓         |❌     |✓    |
-|Serial port  |✓      |✓         |❌     |✓    |
-
-- File Transfer
-
-|        |Windows|Unix/Linux|Android|macOS|
-|--------|-------|----------|-------|-----|
-|FTP     |…      |…         |…      |…    |
-|SFTP    |…      |…         |…      |…    |
-
-- Tool
-
-|           |Windows|Unix/Linux|Android|macOS|
-|-----------|-------|----------|-------|-----|
-|Player     |✓      |✓         |✓      |✓    |
-|Wake on lan|✓      |✓         |✓      |✓    |
-|Screenshot |✓      |✓         |       |✓    |
-|Web browser|✓      |✓         |❌     |✓    |
-
-Legend:  
- ✓ : completed; … : working; ⭕ : not completed; Empty: not started; ❌: not supported
-
-### Supported multiple languages
-
-- [x] English
-- [x] Chinese
-  - [x] Simplified Chinese
-  - [x] Traditional Chinese
-
-### Supported protocols
-
-#### Remote control protocols
-
-- [x] RFB(Remote frame buffer) is also called VNC(Virtual Network Computing): [https://github.com/rfbproto/rfbproto](https://github.com/rfbproto/rfbproto)
-- [x] RDP(Remote desktop protocol): [https://github.com/FreeRDP/FreeRDP/wiki/Reference-Documentation](https://github.com/FreeRDP/FreeRDP/wiki/Reference-Documentation)
-- [ ] Spice: [https://www.spice-space.org/](https://www.spice-space.org/)
-- [x] SSH: [https://www.rfc-editor.org/info/rfc4251](https://www.rfc-editor.org/info/rfc4251)
-  - [x] [libssh](https://api.libssh.org/stable/index.html)
-- [x] TELNET: [https://www.rfc-editor.org/info/rfc318](https://www.rfc-editor.org/info/rfc318)
-- [x] Terminal
-- [ ] scrcpy: [https://github.com/Genymobile/scrcpy](https://github.com/Genymobile/scrcpy)
-- [x] FTP(File Transfer Protocol): [https://www.rfc-editor.org/info/rfc959](https://www.rfc-editor.org/info/rfc959)
-- [x] SFTP(Secure Shell File Transfer Protocol): [https://tools.ietf.org/html/draft-ietf-secsh-filexfer-02](https://tools.ietf.org/html/draft-ietf-secsh-filexfer-02)
-
-#### Network protocols
-
-- [x] Peer-to-Peer (P2P) protocol
-  + ICE (Interactive Connectivity Establishment): [RFC 8445](https://datatracker.ietf.org/doc/rfc8445/) 
-  + STUN: [RFC 5389](https://datatracker.ietf.org/doc/rfc5389/)
-  + TURN(Traversal Using Relays around NAT): [RFC 5766](https://datatracker.ietf.org/doc/rfc5766/)
-- [x] Proxy
-  + [x] socks
-  + [ ] http
-  + [x] Peer-to-Peer (P2P) proxy protocol: [https://github.com/KangLin/RabbitRemoteControl/issues/7](https://github.com/KangLin/RabbitRemoteControl/issues/7)
-
-#### Plugins
-
-- [FreeRDP](Plugins/FreeRDP/README.md)
-- VNC
-  - [RabbitVNC](Plugins/RabbitVNC/README.md)
-  - [TigerVnc](Plugins/TigerVnc/README.md)
-  - [LibVNCServer](Plugins/LibVNCServer/README.md)
-- [Wake on lan](Plugins/WakeOnLan/README.md)
-- [Player](Plugins/Player/README.md)
-- [Screen capture: Example](Plugins/ScreenCapture)
-- Terminal
-  - [Terminal](Plugins/Terminal)
-  - [SSH](Plugins/SSH)
-  - [TELNET](Plugins/Telnet)
-  - [Serial Port](Plugins/SerialPort)
-- [File transfer](Plugins/FileTransfer/README.md)
-- [Ftp server](Plugins/FtpServer/README.md)
-- [Web browser](Plugins/WebBrowser)
-
-## Status
-
-[![Development documentation](https://img.shields.io/badge/documentation-online-blue?label=Development%20documents)](https://kanglin.github.io/RabbitRemoteControl/English/html/index.html)
-[![User manual](https://img.shields.io/badge/documentation-online-blue?label=User%20manual)](https://github.com/KangLin/RabbitRemoteControl/wiki/UserManual)
-
-[![Latest Release](https://img.shields.io/github/release/KangLin/RabbitRemoteControl.svg?label=Github%20latest%20Release)](https://github.com/KangLin/RabbitRemoteControl/releases/latest)
-[![Release](https://img.shields.io/github/release-pre/KangLin/RabbitRemoteControl?label=Github%20Release)](https://github.com/KangLin/RabbitRemoteControl/releases)
-[![rabbitremotecontrol](https://snapcraft.io/rabbitremotecontrol/badge.svg)](https://snapcraft.io/rabbitremotecontrol)
-[![rabbitremotecontrol](https://snapcraft.io/rabbitremotecontrol/trending.svg?name=0)](https://snapcraft.io/rabbitremotecontrol)
-
-[![Downloads from github](https://img.shields.io/github/downloads/KangLin/RabbitRemoteControl/total?label=Github%20downloads)](http://gra.caldis.me/?user=KangLin&repo=KangLin/RabbitRemoteControl)
-[![Downloads from sourceforge](https://img.shields.io/sourceforge/dt/rabbitremotecontrol.svg?label=Sourceforge%20downloads)](https://sourceforge.net/projects/rabbitremotecontrol/files/latest/download)
-
-[![Gitter](https://badges.gitter.im/RabbitRemoteControl/community.svg)](https://gitter.im/RabbitRemoteControl/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
-[![GitHub issues](https://img.shields.io/github/issues/KangLin/RabbitRemoteControl)](https://github.com/KangLin/RabbitRemoteControl/issues)
-[![GitHub forks](https://img.shields.io/github/forks/KangLin/RabbitRemoteControl)](https://github.com/KangLin/RabbitRemoteControl/)
-[![Commit Activity](https://img.shields.io/github/commit-activity/m/KangLin/RabbitRemoteControl)](https://github.com/KangLin/RabbitRemoteControl/pulse)
-[![Last Commit](https://img.shields.io/github/last-commit/KangLin/RabbitRemoteControl)](https://github.com/KangLin/RabbitRemoteControl/pulse)
-[![Contributors](https://img.shields.io/github/contributors/KangLin/RabbitRemoteControl.svg?label=Contributors)](https://github.com/KangLin/RabbitRemoteControl/graphs/contributors)
-
-[![Welcome Pull Requests](https://img.shields.io/badge/PRs-welcome-yellow.svg)](https://github.com/KangLin/RabbitRemoteControl/pulls)
-[![Open Pull Requests](https://img.shields.io/github/issues-pr/KangLin/RabbitRemoteControl)](https://github.com/KangLin/RabbitRemoteControl/pulls)
-[![Closed Pull Requests](https://img.shields.io/github/issues-pr-closed/KangLin/RabbitRemoteControl)](https://github.com/KangLin/RabbitRemoteControl/pulls?q=is%3Apr+is%3Aclosed)
-
-[![C++](https://img.shields.io/badge/language-c++-red.svg)](https://en.cppreference.com/)
-![Language](https://img.shields.io/github/languages/top/kanglin/RabbitRemoteControl)
-[![Qt5](https://img.shields.io/badge/Qt-5-brightgreen)](https://doc.qt.io/qt-5/)
-[![Qt6](https://img.shields.io/badge/Qt-6-brightgreen)](https://doc.qt.io/qt-6/)
-[![platform](https://img.shields.io/badge/platform-windows%20|%20linux%20|%20android%20|%20macos-blue.svg)](https://github.com/KangLin/RabbitRemoteControl)
-
-#### Stargazers over time
-[![GitHub stars](https://img.shields.io/github/stars/KangLin/RabbitRemoteControl?label=Github%20stars)](https://star-history.com/#KangLin/RabbitRemoteControl&Date)
-[![Gitee stars](https://gitee.com/kl222/RabbitRemoteControl/badge/star.svg?theme=dark)](https://gitee.com/kl222/RabbitRemoteControl/stargazers)
-
-[![Stargazers over time](https://starchart.cc/KangLin/RabbitRemoteControl.svg)](https://starchart.cc/KangLin/RabbitRemoteControl)
-
-### Build status
-
-| master|  develop |
-|:-----:|:--------:|
-[![build](https://github.com/KangLin/RabbitRemoteControl/actions/workflows/build.yml/badge.svg)](https://github.com/KangLin/RabbitRemoteControl/actions/workflows/build.yml)|[![build](https://github.com/KangLin/RabbitRemoteControl/actions/workflows/build.yml/badge.svg?branch=develop)](https://github.com/KangLin/RabbitRemoteControl/actions/workflows/build.yml)|
-
-## Sponsorship and Donations
-
-If this software is useful to you, or you like it, please donate and support the author. Thank you!
-
-[![donation](https://github.com/KangLin/RabbitCommon/raw/master/Src/Resource/image/Contribute_en.png "donation")](https://github.com/KangLin/RabbitCommon/raw/master/Src/Resource/image/Contribute_en.png "donation") 
-
-If it cannot be displayed, please open:
-- https://gitlab.com/kl222/RabbitCommon/-/raw/master/Src/Resource/image/Contribute_en.png
-- https://sourceforge.net/p/rabbitcommon/code/ci/master/tree/Src/Resource/image/Contribute_en.png
-
-Contact me:
-- <kl222@126.com>
-- [jami](https://jami.net): eddacfd6c7b70b258e511e812ffab7d3490396fa
-
-## Contribution
-
-- [Issues](https://github.com/KangLin/RabbitRemoteControl/issues)
-- [Discussions](https://github.com/KangLin/RabbitRemoteControl/discussions)
-- [Mailing list](https://sourceforge.net/p/rabbitremotecontrol/mailman/)
-  - Developer <rabbitremotecontrol-developer@lists.sourceforge.net>
-  - Discuss <rabbitremotecontrol-discuss@lists.sourceforge.net>
-- [![Join the chat at https://gitter.im/RabbitRemoteControl/community](https://badges.gitter.im/RabbitRemoteControl/community.svg)](https://gitter.im/RabbitRemoteControl/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-- [Contributors](https://github.com/KangLin/RabbitRemoteControl/graphs/contributors):
-  Thank [Contributors](https://github.com/KangLin/RabbitRemoteControl/graphs/contributors)
-- Maintenance package
-  - [ ] Linux
-    - [ ] Debian: Need to maintain official packages
-    - [ ] RPM: Need to maintain official packages
-    - [x] AppImage
-    - [x] Snap: https://snapcraft.io/rabbitremotecontrol
-    - [x] Flatpak: https://github.com/flathub/io.github.KangLin.RabbitRemoteControl
-  - Windows
-    - [ ] Windows store: Need to maintain official packages
-  - [ ] macOS: Need to maintain official packages
-  - [ ] Android: Need to maintain official packages
-
-## Download
-
-- [Change log](ChangeLog.md)
-- Semantic Versioning: https://semver.org/
-- [User manual](https://github.com/KangLin/RabbitRemoteControl/wiki/UserManual)
-- Release: 
-  - [![Latest Release](https://img.shields.io/github/release/KangLin/RabbitRemoteControl.svg?label=Github%20latest%20Release)](https://github.com/KangLin/RabbitRemoteControl/releases/latest)
-  - [![Release](https://img.shields.io/github/release-pre/KangLin/RabbitRemoteControl?label=Github%20Release)](https://github.com/KangLin/RabbitRemoteControl/releases)
-  - [![Download RabbitRemoteControl](https://a.fsdn.com/con/app/sf-download-button)](https://sourceforge.net/projects/rabbitremotecontrol/files/latest/download)
-  - [![rabbitremotecontrol](https://snapcraft.io/rabbitremotecontrol/badge.svg)](https://snapcraft.io/rabbitremotecontrol)
-    [![rabbitremotecontrol](https://snapcraft.io/rabbitremotecontrol/trending.svg?name=0)](https://snapcraft.io/rabbitremotecontrol)
-  - [![Download from Flathub](https://flathub.org/api/badge?locale=en)](https://flathub.org/apps/io.github.KangLin.RabbitRemoteControl)
-
-## [Development](docs/Doxygen/Develop.md)
-
-### Development documentation online
-
-- [sourceforge](https://rabbitremotecontrol.sourceforge.io/v0.1.0-dev/English/html/index.html)
-- [github.io](https://kanglin.github.io/RabbitRemoteControl/English/html/index.html)
-
-### Compilation
-
-- [Compiling for Linux](docs/Compile/Linux.md)
-- [Compiling for Windows](docs/Compile/Windows.md)
-- [Compiling for macOS](docs/Compile/macOS.md)
-- [Compiling for Android](docs/Compile/Android_zh_CN.md)
-- [Compiling for termux](docs/Compile/Termux.md)
-
-## [License Agreement](License.md "License.md")
-
-Please abide by the [License Agreement](License.md "License.md") of this project
-and the license agreement of the [dependent library](#Dependent-libraries),
-and thank the authors of [dependent library](#Dependent-libraries) and [tools](#Tools).
+官方依赖较多，建议直接使用 GitHub Actions 编译 Windows 版本。
+
+### 本地准备
+
+- Visual Studio 2022（MSVC）
+- Qt 6.10.x（Windows MSVC 64-bit）
+- CMake 3.27 或更高版本
+- vcpkg
+- RabbitCommon（构建脚本会自动拉取）
+
+### GitHub Actions
+
+推送到 `main` 分支，或在仓库的 Actions 页面手动运行 **GoDesk Windows client** 工作流。工作流会编译官方矩阵中的 Windows 版本，并在 x64 构建成功后发布 `nightly` 安装包。
+
+### 本地命令（仅用于开发调试）
+
+```powershell
+git clone https://github.com/lieren2012/GoDesk.git
+cd GoDesk
+git submodule update --init --recursive
+cmake --preset msvc-x64-qt6
+cmake --build build/x64 --config Release
+```
+
+本地编译需要自行设置 `QT_ROOT`、`Qt6_DIR` 和 `VCPKG_ROOT`。完整依赖说明见 [Windows 编译文档](docs/Compile/Windows_zh_CN.md)。
+
+## 项目结构
+
+```text
+App/Client       Qt 桌面客户端
+Plugins/          VNC、RDP、终端及工具插件
+Src/              公共协议与连接逻辑
+Update/           更新清单和更新配置
+.github/workflows GitHub Actions 构建与发布
+ docs/ui/         GoDesk 界面原型
+```
+
+## 开发计划
+
+- [x] 建立 GoDesk 公共仓库和 GitHub Actions Windows 构建
+- [x] 第一版桌面端视觉方案
+- [x] GitHub Release 更新检查、下载和用户确认
+- [ ] 将 Qt 主窗口全面替换为 GoDesk 信息架构
+- [ ] 完善安装包签名、版本渠道和回滚
+- [ ] 增加连接导入导出、设备搜索和更清晰的错误提示
+
+## 参与贡献
+
+欢迎提交 Issue 和 Pull Request。涉及协议、插件或安装包改动时，请同时说明：
+
+- 使用的平台和 Qt 版本
+- 是否能稳定复现
+- 日志中与问题相关的片段
+- 预期行为与实际行为
+
+## 许可证
+
+GoDesk 采用 [GNU General Public License v3.0](LICENSE)。原项目及其第三方组件的版权和许可证信息请查看 [Authors.md](Authors.md)、[License.md](License.md) 以及各插件目录中的说明。
