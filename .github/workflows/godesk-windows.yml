@@ -32,7 +32,7 @@ jobs:
       contents: write
     env:
       GH_TOKEN: ${{ github.token }}
-      VERSION: 0.1.${{ github.run_number }}.0
+      VERSION: 0.1.${{ github.run_number }}-ci
     steps:
       - name: Download Windows installers
         uses: actions/download-artifact@v4
