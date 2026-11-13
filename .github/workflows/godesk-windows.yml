@@ -75,8 +75,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          gh release delete nightly --cleanup-tag --yes || true
-          gh release create nightly \
+          gh release delete nightly --repo lieren2012/GoDesk --cleanup-tag --yes || true
+          gh release create nightly --repo lieren2012/GoDesk \
             --prerelease --latest=false \
             --title "GoDesk ${VERSION}" \
             --notes "自动构建的 Windows 客户端，安装前请确认来源和版本。" \
