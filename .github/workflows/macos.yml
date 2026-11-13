@@ -80,9 +80,11 @@ jobs:
           vcpkgDirectory: ${{env.SOURCE_DIR}}/vcpkg          
 
       - name: install nasm
+        env:
+          HOMEBREW_NO_AUTO_UPDATE: 1
         run: |
-          # See: https://formulae.brew.sh/
-          brew update
+          # The Intel macOS runner can hang during brew update. The runner image
+          # already has a current Homebrew index, so avoid a network refresh.
           brew install nasm autoconf automake ninja make libtool pkg-config zstd libpcap libvncserver # pcapplusplus qt qtkeychain
 
       - name: build RabbitVNC
