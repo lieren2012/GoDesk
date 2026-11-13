@@ -1,0 +1,72 @@
+name: GoDesk Windows client
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  windows:
+    uses: ./.github/workflows/msvc.yml
+    secrets: inherit
+
+  publish-nightly:
+    needs: windows
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      VERSION: 0.1.${{ github.run_number }}
+    steps:
+      - name: Download Windows installers
+        uses: actions/download-artifact@v4
+        with:
+          pattern: build_msvc_*
+          path: dist
+          merge-multiple: true
+
+      - name: Prepare GoDesk update manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p dist/publish
+          x64="$(find dist -type f -name '*win64_msvc2022_64*Setup.exe' | head -n 1)"
+          test -n "$x64"
+          cp "$x64" dist/publish/GoDesk_Setup.exe
+          md5="$(md5sum dist/publish/GoDesk_Setup.exe | awk '{print $1}')"
+          cat > dist/publish/update.json <<EOF
+          {
+            "version": {
+              "version": "${VERSION}",
+              "time": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+              "information": "GoDesk Windows client update",
+              "home": "https://github.com/lieren2012/GoDesk/releases/tag/nightly",
+              "force": false
+            },
+            "files": [
+              {
+                "os": "windows",
+                "arch": "x86_64",
+                "md5": "${md5}",
+                "file_name": "GoDesk_Setup.exe",
+                "urls": ["https://github.com/lieren2012/GoDesk/releases/download/nightly/GoDesk_Setup.exe"]
+              }
+            ]
+          }
+          EOF
+
+      - name: Publish nightly release
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh release delete nightly --cleanup-tag --yes || true
+          gh release create nightly \
+            --prerelease --latest=false \
+            --title "GoDesk ${VERSION}" \
+            --notes "自动构建的 Windows 客户端，安装前请确认来源和版本。" \
+            dist/publish/GoDesk_Setup.exe \
+            dist/publish/update.json

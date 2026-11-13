@@ -23,6 +23,8 @@
 #include <QInputMethod>
 #include <QGuiApplication>
 #include <QCommandLineParser>
+#include <QTimer>
+#include <QUrl>
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -53,6 +55,15 @@
 static Q_LOGGING_CATEGORY(log, "App.MainWindow")
 static Q_LOGGING_CATEGORY(logRecord, "App.MainWindow.Record")
 
+#ifdef HAVE_UPDATE
+static QVector<QUrl> GoDeskUpdateUrls()
+{
+    // The nightly release keeps a stable URL. The workflow replaces the
+    // manifest and installer assets when a new main build is published.
+    return { QUrl("https://github.com/lieren2012/GoDesk/releases/download/nightly/update.json") };
+}
+#endif
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , m_pToolBarMenuAction(nullptr)
@@ -78,6 +89,28 @@ MainWindow::MainWindow(QWidget *parent)
     bool check = false;
 
     ui->setupUi(this);
+    setWindowTitle(qApp->applicationDisplayName());
+    setMinimumSize(QSize(900, 600));
+    resize(QSize(1180, 760));
+
+    // A restrained light surface makes the existing docks and tab views read
+    // as one workspace without changing their connection behaviour.
+    setStyleSheet(R"(
+        QMainWindow { background: #f4f7fb; }
+        QMenuBar { background: #ffffff; border-bottom: 1px solid #e6ebf2; padding: 3px 8px; }
+        QMenuBar::item { padding: 6px 10px; border-radius: 6px; }
+        QMenuBar::item:selected { background: #edf3ff; color: #245de0; }
+        QToolBar { background: #ffffff; border: 0; border-bottom: 1px solid #e6ebf2; spacing: 6px; padding: 7px 10px; }
+        QToolButton { color: #334155; border: 1px solid transparent; border-radius: 8px; padding: 6px 9px; }
+        QToolButton:hover { background: #edf3ff; color: #245de0; }
+        QToolButton:checked { background: #dce8ff; color: #245de0; }
+        QDockWidget { color: #172033; titlebar-close-icon: none; titlebar-normal-icon: none; }
+        QDockWidget::title { background: #ffffff; border: 0; border-bottom: 1px solid #e6ebf2; padding: 8px 10px; text-align: left; }
+        QStatusBar { background: #ffffff; border-top: 1px solid #e6ebf2; color: #7b879b; }
+        QSplitter::handle { background: #e6ebf2; }
+        QTabBar::tab { background: #eef2f7; color: #64748b; padding: 8px 14px; border: 0; border-radius: 7px; margin: 2px; }
+        QTabBar::tab:selected { background: #2f6df6; color: #ffffff; }
+    )");
     ui->menubar->show();
 
     //!\~chinese 当有停泊条且视图类型改变时，使用一个容器窗口，防止视图窗口大小发生改变。
@@ -86,6 +119,7 @@ MainWindow::MainWindow(QWidget *parent)
     //!  use a container window to prevent the view window size from changing.
     QWidget* pContain = new QWidget(this);
     if(pContain) {
+        pContain->setObjectName("mainSurface");
         pContain->setContentsMargins(0, 0, 0, 0);
         setCentralWidget(pContain);
     }
@@ -556,6 +590,25 @@ int MainWindow::Initial()
 
         slotInformation(tr("Ready"));
 
+#ifdef HAVE_UPDATE
+        // Check the GoDesk release channel after the main window is ready so
+        // startup is not blocked by a network request. CFrmUpdater only shows
+        // its window when a newer package is available or a download fails.
+        QTimer::singleShot(1500, this, [this]() {
+            if(!m_pAutoUpdater && qEnvironmentVariable("SNAP").isEmpty()
+                && qEnvironmentVariable("FLATPAK_ID").isEmpty()) {
+                m_pAutoUpdater = new CFrmUpdater(GoDeskUpdateUrls(), this);
+                QIcon icon = windowIcon();
+                if(!icon.isNull()) {
+                    const auto sizes = icon.availableSizes();
+                    if(!sizes.isEmpty())
+                        m_pAutoUpdater->SetTitle(icon.pixmap(sizes.front()).toImage(),
+                                                 tr("GoDesk 更新"));
+                }
+            }
+        });
+#endif
+
         return nRet;
     } while(false);
     
@@ -691,7 +744,7 @@ void MainWindow::on_actionUpdate_triggered()
         QDesktopServices::openUrl(QUrl("https://flathub.org/apps/io.github.KangLin.RabbitRemoteControl"));
     } else {
 #ifdef HAVE_UPDATE
-    CFrmUpdater* m_pfrmUpdater = new CFrmUpdater();
+    CFrmUpdater* m_pfrmUpdater = new CFrmUpdater(GoDeskUpdateUrls(), this);
     QIcon icon = windowIcon(); // QIcon::fromTheme("app");
     if(!icon.isNull()) {
         auto sizeList = icon.availableSizes();

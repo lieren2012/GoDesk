@@ -28,6 +28,9 @@ QT_END_NAMESPACE
 
 class CFrmFullScreenToolBar;
 class QSplashScreen;
+#ifdef HAVE_UPDATE
+class CFrmUpdater;
+#endif
 
 /*!
  * \brief The MainWindow class
@@ -71,6 +74,9 @@ private Q_SLOTS:
     void slotStartByType();
 private:
     CManager m_Manager;
+#ifdef HAVE_UPDATE
+    CFrmUpdater* m_pAutoUpdater = nullptr;
+#endif
     QSet<COperate*> m_Operates;
     QMap<CPlugin::TYPE, QMenu*> m_MenuStartByType;
 

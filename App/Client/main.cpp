@@ -169,8 +169,11 @@ int main(int argc, char *argv[])
         QSharedPointer<QTranslator> tApp =
             RabbitCommon::CTools::Instance()->InstallTranslator("RabbitRemoteControlApp");
 
-        app.setApplicationDisplayName(QObject::tr("Rabbit Remote Control"));
-        app.setOrganizationName(QObject::tr("Kang Lin Studio"));
+        // GoDesk keeps the original protocol and plugin implementation, while
+        // using its own application identity for settings and update channels.
+        app.setApplicationName("GoDesk");
+        app.setApplicationDisplayName(QObject::tr("GoDesk"));
+        app.setOrganizationName("GoDesk");
 
         ShowMessageInSplashScreen(QObject::tr("Start") + " ......");
 
