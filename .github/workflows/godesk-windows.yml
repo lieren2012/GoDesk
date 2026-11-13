@@ -5,6 +5,10 @@ on:
   push:
     branches: [main]
 
+concurrency:
+  group: godesk-platform-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: write
 
@@ -28,7 +32,7 @@ jobs:
       contents: write
     env:
       GH_TOKEN: ${{ github.token }}
-      VERSION: 0.1.${{ github.run_number }}
+      VERSION: 0.1.${{ github.run_number }}.0
     steps:
       - name: Download Windows installers
         uses: actions/download-artifact@v4

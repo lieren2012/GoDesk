@@ -68,7 +68,7 @@ jobs:
       artifact_name: build_msvc
       # Use the workflow run number as the patch component so the updater can
       # compare every published build with the installed client.
-      RabbitRemoteControl_VERSION: 0.1.${{ github.run_number }}
+      RabbitRemoteControl_VERSION: 0.1.${{ github.run_number }}.0
 
     # Map the job outputs to step outputs
     outputs:
