@@ -487,7 +487,7 @@ jobs:
             copy /Y "${{env.INSTALL_DIR}}\npcap-1.87.exe" install\bin
           )
           ;7z a RabbitRemoteControl_${{env.RabbitRemoteControl_VERSION}}_${{matrix.qt_arch}}_qt${{matrix.qt_version}}_Portable.zip .\install\*
-          makensis Windows.nsi
+          makensis /DPRODUCT_VERSION=${{env.RabbitRemoteControl_VERSION}} Windows.nsi
           echo "Copy exe file: copy /Y RabbitRemoteControl_Setup_${{env.RabbitRemoteControl_VERSION}}.exe RabbitRemoteControl_${{env.RabbitRemoteControl_VERSION}}_${{matrix.qt_arch}}_qt${{matrix.qt_version}}_Setup.exe"
           copy /Y RabbitRemoteControl_Setup_${{env.RabbitRemoteControl_VERSION}}.exe RabbitRemoteControl_${{env.RabbitRemoteControl_VERSION}}_${{matrix.qt_arch}}_qt${{matrix.qt_version}}_Setup.exe
 
