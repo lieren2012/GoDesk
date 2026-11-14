@@ -24,7 +24,7 @@ int CRecentDatabase::RecentItem::SetFile(const QString& file) {
     return 0;
 }
 
-QString CRecentDatabase::RecentItem::GetFile() {
+QString CRecentDatabase::RecentItem::GetFile() const {
     return CDatabaseFile::GetFile(szFile);
 }
 

@@ -28,7 +28,7 @@ public:
         QString szProtocol;
         QString szType;
         int SetFile(const QString& file);
-        QString GetFile();
+        QString GetFile() const;
         QDateTime time;
         QString szDescription;
         RecentItem();
