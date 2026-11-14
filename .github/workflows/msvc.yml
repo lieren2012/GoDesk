@@ -497,7 +497,7 @@ jobs:
             copy /Y "${{env.INSTALL_DIR}}\npcap-1.87.exe" install\bin
           )
           ;7z a RabbitRemoteControl_${{env.RabbitRemoteControl_VERSION}}_${{matrix.qt_arch}}_qt${{matrix.qt_version}}_Portable.zip .\install\*
-          makensis /DPRODUCT_VERSION=${{env.RabbitRemoteControl_VERSION}} Windows.nsi
+          "C:\Program Files (x86)\NSIS\makensis.exe" /DPRODUCT_VERSION=${{env.RabbitRemoteControl_VERSION}} Windows.nsi
           echo "Copy exe file: copy /Y GoDesk_Setup_${{env.RabbitRemoteControl_VERSION}}.exe GoDesk_v0.1.12_Windows_Setup.exe"
           copy /Y GoDesk_Setup_${{env.RabbitRemoteControl_VERSION}}.exe GoDesk_v0.1.12_Windows_Setup.exe
 
