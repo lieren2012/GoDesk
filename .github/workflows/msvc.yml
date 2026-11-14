@@ -248,6 +248,12 @@ jobs:
           cache: true
           cache-key-prefix: cached-qt_${{matrix.qt_version}}_${{matrix.qt_arch}}
 
+      - name: Install NSIS
+        if: ${{ matrix.BUILD_TYPE == 'Release' }}
+        shell: powershell
+        run: |
+          choco install nsis --no-progress --yes
+
       - name: build qxmpp
         if: false
         working-directory: ${{env.SOURCE_DIR}}
