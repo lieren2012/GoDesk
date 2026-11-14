@@ -383,6 +383,10 @@ jobs:
 
       - name: QFtpServer
         working-directory: ${{env.SOURCE_DIR}}
+        # Optional FTP server dependency; skip it for the Windows client release.
+        # The client and its FTP/SFTP plugins use the already provisioned
+        # runtime dependencies and do not require building QFtpServer here.
+        if: false
         run: |
           IF NOT EXIST ${{env.INSTALL_DIR}}/QFtpServerLib/QFtpServerLib (
               git clone https://github.com/KangLin/QFtpServer.git
