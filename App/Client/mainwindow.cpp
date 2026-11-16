@@ -239,8 +239,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->toolBar->insertWidget(ui->actionOpenListRecent, tbRecent);
 
 #ifdef HAVE_UPDATE
-    CFrmUpdater updater;
-    ui->actionUpdate->setIcon(updater.windowIcon());
+    ui->actionUpdate->setIcon(QIcon(QStringLiteral(":/app")));
 #endif
 
     QToolButton* tbStart = new QToolButton(ui->toolBar);
