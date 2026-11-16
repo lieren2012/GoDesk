@@ -150,7 +150,7 @@ endif()
 string(REGEX REPLACE "^v" "" RabbitRemoteControl_VERSION "${RabbitRemoteControl_VERSION}")
 if(NOT RabbitRemoteControl_VERSION
    OR RabbitRemoteControl_VERSION MATCHES "^0\\.0\\.36([+\\-^_~0-9A-Za-z].*)?$")
-   OR NOT(RabbitRemoteControl_VERSION MATCHES "[0-9]+\\.[0-9]+\\.[0-9]+[+\\-^_~0-9A-Za-z]*"))
+   OR NOT (RabbitRemoteControl_VERSION MATCHES "[0-9]+\\.[0-9]+\\.[0-9]+[+\\-^_~0-9A-Za-z]*"))
     set(RabbitRemoteControl_VERSION "0.1.12")
 endif()
 # Release tags and all generated metadata must use the same GoDesk version.
