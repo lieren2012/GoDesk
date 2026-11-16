@@ -27,7 +27,7 @@ jobs:
       VCPKG_INSTALLED_DIR: ${{github.workspace}}\.cache\install
       VCPKG_DEFAULT_BUILDTREES_ROOT: D:/bt
       VCPKG_DEFAULT_BINARY_CACHE: D:/bc
-      RabbitRemoteControl_VERSION: v0.0.36
+      RabbitRemoteControl_VERSION: 0.1.12
       BUILD_DIR:   ${{github.workspace}}\build
       SOURCE_DIR:  ${{github.workspace}}\.cache\source
       TOOLS_DIR:   ${{github.workspace}}\.cache\tools

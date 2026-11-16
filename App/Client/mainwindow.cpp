@@ -36,7 +36,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #ifdef HAVE_UPDATE
-    #include "FrmUpdater.h"
+    #include "GoDeskUpdateDialog.h"
 #endif
 #include "RabbitCommonDir.h"
 #include "RabbitCommonTools.h"
@@ -61,15 +61,6 @@
 
 static Q_LOGGING_CATEGORY(log, "App.MainWindow")
 static Q_LOGGING_CATEGORY(logRecord, "App.MainWindow.Record")
-
-#ifdef HAVE_UPDATE
-static QVector<QUrl> GoDeskUpdateUrls()
-{
-    // The nightly release keeps a stable URL. The workflow replaces the
-    // manifest and installer assets when a new main build is published.
-    return { QUrl("https://github.com/lieren2012/GoDesk/releases/download/nightly/update.json") };
-}
-#endif
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -620,20 +611,16 @@ int MainWindow::Initial()
         slotInformation(tr("Ready"));
 
 #ifdef HAVE_UPDATE
-        // Check the GoDesk release channel after the main window is ready so
-        // startup is not blocked by a network request. CFrmUpdater only shows
-        // its window when a newer package is available or a download fails.
+        // Check the formal GoDesk release channel after the main window is
+        // ready so startup is not blocked by a network request. The dialog
+        // stays hidden when the current version is already the latest.
         QTimer::singleShot(1500, this, [this]() {
             if(!m_pAutoUpdater && qEnvironmentVariable("SNAP").isEmpty()
                 && qEnvironmentVariable("FLATPAK_ID").isEmpty()) {
-                m_pAutoUpdater = new CFrmUpdater(GoDeskUpdateUrls(), this);
-                QIcon icon = windowIcon();
-                if(!icon.isNull()) {
-                    const auto sizes = icon.availableSizes();
-                    if(!sizes.isEmpty())
-                        m_pAutoUpdater->SetTitle(icon.pixmap(sizes.front()).toImage(),
-                                                 tr("GoDesk 更新"));
-                }
+                m_pAutoUpdater = new GoDeskUpdateDialog(this, false);
+                connect(m_pAutoUpdater, &QObject::destroyed, this,
+                        [this]() { m_pAutoUpdater = nullptr; });
+                m_pAutoUpdater->StartCheck();
             }
         });
 #endif
@@ -865,17 +852,8 @@ void MainWindow::on_actionUpdate_triggered()
         QDesktopServices::openUrl(QUrl("https://flathub.org/apps/io.github.KangLin.RabbitRemoteControl"));
     } else {
 #ifdef HAVE_UPDATE
-    CFrmUpdater* m_pfrmUpdater = new CFrmUpdater(GoDeskUpdateUrls(), this);
-    QIcon icon = windowIcon(); // QIcon::fromTheme("app");
-    if(!icon.isNull()) {
-        auto sizeList = icon.availableSizes();
-        if(!sizeList.isEmpty()) {
-            QPixmap p = icon.pixmap(*sizeList.begin());
-            m_pfrmUpdater->SetTitle(p.toImage());
-        }
-    }
-    m_pfrmUpdater->SetInstallAutoStartup();
-    RC_SHOW_WINDOW(m_pfrmUpdater);
+    auto* updater = new GoDeskUpdateDialog(this, true);
+    updater->StartCheck();
 #endif
     }
 }

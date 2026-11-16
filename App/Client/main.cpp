@@ -187,7 +187,10 @@ int main(int argc, char *argv[])
         QScopedPointer<CFrmUpdater> pUpdater;
         if(generateUpdate) {
             QVector<QUrl> updateUrls;
-            updateUrls << QUrl("https://github.com/lieren2012/GoDesk/releases/download/nightly/update.json");
+            const QString releaseUrl = QStringLiteral(
+                "https://github.com/lieren2012/GoDesk/releases/download/v%1/GoDesk_v%1_Windows_Setup.exe")
+                .arg(app.applicationVersion());
+            updateUrls << QUrl(releaseUrl);
             pUpdater.reset(new CFrmUpdater(updateUrls));
         }
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)

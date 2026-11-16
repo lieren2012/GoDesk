@@ -31,7 +31,7 @@ QT_END_NAMESPACE
 class CFrmFullScreenToolBar;
 class QSplashScreen;
 #ifdef HAVE_UPDATE
-class CFrmUpdater;
+class GoDeskUpdateDialog;
 #endif
 
 /*!
@@ -77,7 +77,7 @@ private Q_SLOTS:
 private:
     CManager m_Manager;
 #ifdef HAVE_UPDATE
-    CFrmUpdater* m_pAutoUpdater = nullptr;
+    GoDeskUpdateDialog* m_pAutoUpdater = nullptr;
 #endif
     QSet<COperate*> m_Operates;
     QMap<CPlugin::TYPE, QMenu*> m_MenuStartByType;
