@@ -94,6 +94,11 @@ LangString LANG_EXTRACT_FILE_END ${LANG_SIMPCHINESE} "解压完成！启动程�
 ; MUI end ------
 
 Name "$(LANG_PRODUCT_NAME) ${PRODUCT_VERSION}"
+VIProductVersion "${PRODUCT_VERSION}.0"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductName" "GoDesk"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "FileDescription" "GoDesk Windows Setup"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductVersion" "${PRODUCT_VERSION}"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "FileVersion" "${PRODUCT_VERSION}"
 Caption "$(LANG_PRODUCT_NAME) ${PRODUCT_VERSION}"
 OutFile "${PRODUCT_NAME}_Setup_${PRODUCT_VERSION}.exe"
 InstallDir "$LOCALAPPDATA\${PRODUCT_NAME}"

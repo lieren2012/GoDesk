@@ -140,12 +140,20 @@ endif()
 # 0.1.13). RabbitCommon's GET_VERSION helper writes its result to the parent
 # scope, so capture the override before calling it or an old repository tag
 # such as the legacy repository tag would silently replace the installer version.
+set(GODESK_RELEASE_VERSION "0.1.13" CACHE STRING "GoDesk Windows release version")
 set(_GoDeskVersionOverride "${RabbitRemoteControl_VERSION}")
-GET_VERSION(OUT_VERSION RabbitRemoteControl_VERSION
+GET_VERSION(OUT_VERSION _GoDeskGitVersion
     OUT_REVISION RabbitRemoteControl_REVISION
     OUT_TAG RabbitRemoteControlTag)
-if(_GoDeskVersionOverride)
+if(WIN32)
+    if(NOT GODESK_RELEASE_VERSION MATCHES "^[0-9]+[.][0-9]+[.][0-9]+$")
+        message(FATAL_ERROR "Invalid GoDesk release version: ${GODESK_RELEASE_VERSION}")
+    endif()
+    set(RabbitRemoteControl_VERSION "${GODESK_RELEASE_VERSION}")
+elseif(_GoDeskVersionOverride)
     set(RabbitRemoteControl_VERSION "${_GoDeskVersionOverride}")
+else()
+    set(RabbitRemoteControl_VERSION "${_GoDeskGitVersion}")
 endif()
 string(REGEX REPLACE "^v" "" RabbitRemoteControl_VERSION "${RabbitRemoteControl_VERSION}")
 if(NOT RabbitRemoteControl_VERSION)

@@ -18,6 +18,7 @@
 #include <QLoggingCategory>
 #include <QApplication>
 #include <QSettings>
+#include <QSaveFile>
 #include <QDebug>
 #include <QtGlobal>
 #include <QSharedPointer>
@@ -131,6 +132,14 @@ int main(int argc, char *argv[])
 #endif
 
     QApplication app(argc, argv);
+
+    const QStringList arguments = app.arguments();
+    if (arguments.size() == 3 && arguments.at(1) == QStringLiteral("--version-file")) {
+        QSaveFile output(arguments.at(2));
+        const QByteArray version = app.applicationVersion().toUtf8();
+        return output.open(QIODevice::WriteOnly) && output.write(version) == version.size()
+            && output.commit() ? 0 : 1;
+    }
 
     QString dataPathError;
     if(!GoDeskDataPaths::instance().initialize(&dataPathError))

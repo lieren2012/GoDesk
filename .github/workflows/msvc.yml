@@ -441,7 +441,7 @@ jobs:
             -DRABBIT_ENABLE_INSTALL_QT=ON ^
             -DRABBIT_ENABLE_INSTALL_TO_BUILD_PATH=ON ^
             -DCMAKE_BUILD_TYPE=${{matrix.BUILD_TYPE}} ^
-            -DRabbitRemoteControl_VERSION=${{env.RabbitRemoteControl_VERSION}} ^
+            -DGODESK_RELEASE_VERSION:STRING=${{env.RabbitRemoteControl_VERSION}} ^
             -DRabbitRemoteControl_REVISION=${{github.sha}} ^
             -DCMAKE_INSTALL_PREFIX=${{env.BUILD_DIR}}/install ^
             -DCMAKE_PREFIX_PATH=${{env.INSTALL_DIR}} ^
@@ -500,6 +500,26 @@ jobs:
           "C:\Program Files (x86)\NSIS\makensis.exe" /DPRODUCT_VERSION=${{env.RabbitRemoteControl_VERSION}} Windows.nsi
           echo "Copy exe file: copy /Y GoDesk_Setup_${{env.RabbitRemoteControl_VERSION}}.exe GoDesk_v0.1.13_Windows_Setup.exe"
           copy /Y GoDesk_Setup_${{env.RabbitRemoteControl_VERSION}}.exe GoDesk_v0.1.13_Windows_Setup.exe
+
+      - name: Verify Windows release versions
+        if: ${{ matrix.BUILD_TYPE == 'Release' }}
+        shell: pwsh
+        working-directory: ${{env.BUILD_DIR}}
+        run: |
+          $expected = $env:RabbitRemoteControl_VERSION
+          $setup = (Resolve-Path "GoDesk_v${expected}_Windows_Setup.exe").Path
+          $client = (Resolve-Path 'install/bin/GoDesk.exe').Path
+          foreach ($file in @($setup, $client)) {
+            $actual = [Diagnostics.FileVersionInfo]::GetVersionInfo($file).ProductVersion
+            if ($actual -cne $expected) { throw "${file}: expected $expected, got '$actual'" }
+          }
+          $output = Join-Path $PWD 'godesk-runtime-version.txt'
+          $process = Start-Process -FilePath $client -ArgumentList @('--version-file', ('"' + $output + '"')) -PassThru -WindowStyle Hidden
+          if (!$process.WaitForExit(30000)) { $process.Kill(); throw 'GoDesk version check timed out' }
+          if ($process.ExitCode -ne 0) { throw "GoDesk version check exited $($process.ExitCode)" }
+          $actual = Get-Content -Raw -LiteralPath $output
+          if ($actual -cne $expected) { throw "Qt version: expected $expected, got '$actual'" }
+          Write-Host "Installer PE, client PE and Qt runtime version: $expected"
 
       - name: Update configure file
         if: ${{ matrix.BUILD_TYPE == 'Release' }}
