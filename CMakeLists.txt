@@ -137,7 +137,7 @@ else()
 endif()
 
 # Keep an explicit release version from the build (the Windows workflow passes
-# 0.1.12). RabbitCommon's GET_VERSION helper writes its result to the parent
+# 0.1.13). RabbitCommon's GET_VERSION helper writes its result to the parent
 # scope, so capture the override before calling it or an old repository tag
 # such as the legacy repository tag would silently replace the installer version.
 set(_GoDeskVersionOverride "${RabbitRemoteControl_VERSION}")
@@ -149,11 +149,11 @@ if(_GoDeskVersionOverride)
 endif()
 string(REGEX REPLACE "^v" "" RabbitRemoteControl_VERSION "${RabbitRemoteControl_VERSION}")
 if(NOT RabbitRemoteControl_VERSION)
-    set(RabbitRemoteControl_VERSION "0.1.12")
+    set(RabbitRemoteControl_VERSION "0.1.13")
 elseif(RabbitRemoteControl_VERSION MATCHES "^0\\.0\\.36([+\\-^_~0-9A-Za-z].*)?$")
-    set(RabbitRemoteControl_VERSION "0.1.12")
+    set(RabbitRemoteControl_VERSION "0.1.13")
 elseif(NOT RabbitRemoteControl_VERSION MATCHES "[0-9]+\\.[0-9]+\\.[0-9]+[+\\-^_~0-9A-Za-z]*")
-    set(RabbitRemoteControl_VERSION "0.1.12")
+    set(RabbitRemoteControl_VERSION "0.1.13")
 endif()
 # Release tags and all generated metadata must use the same GoDesk version.
 set(RabbitRemoteControlTag "${RabbitRemoteControl_VERSION}")

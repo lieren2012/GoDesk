@@ -82,7 +82,7 @@ GoDeskUpdateDialog::GoDeskUpdateDialog(QWidget* parent, bool showIfUpToDate)
 
     m_CurrentVersion = NormalizeVersion(QCoreApplication::applicationVersion());
     if (m_CurrentVersion.isEmpty())
-        m_CurrentVersion = QStringLiteral("0.1.12");
+        m_CurrentVersion = QStringLiteral("0.1.13");
     m_CurrentVersionLabel->setText(m_CurrentVersion);
     m_LatestVersionLabel->setText(tr("检查中..."));
     m_SourceLabel->setText(tr("GitHub Release API：%1").arg(m_ApiUrl.toString()));
