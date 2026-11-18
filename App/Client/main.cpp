@@ -44,6 +44,7 @@
 
 #include "StatsAppUsage.h"
 #include "mainwindow.h"
+#include "GoDeskDataPaths.h"
 
 static Q_LOGGING_CATEGORY(log, "App")
 
@@ -124,11 +125,16 @@ int main(int argc, char *argv[])
 
     QApplication::setApplicationVersion(RabbitRemoteControl_VERSION);
     QApplication::setApplicationName("GoDesk");
+    QApplication::setOrganizationName("GoDesk");
 #if QT_VERSION >= QT_VERSION_CHECK(5, 7, 0)
     QApplication::setDesktopFileName(QLatin1String("io.github.KangLin.RabbitRemoteControl.desktop"));
 #endif
 
     QApplication app(argc, argv);
+
+    QString dataPathError;
+    if(!GoDeskDataPaths::instance().initialize(&dataPathError))
+        qWarning(log) << "GoDesk data path initialization failed:" << dataPathError;
 
     QInputMethod *inputMethod = app.inputMethod();
     qDebug(log) << "Input method available:" << (inputMethod != nullptr);

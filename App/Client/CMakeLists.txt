@@ -24,6 +24,7 @@ set(SOURCE_FILES
     Recent/RecentDatabase.cpp
     FrmActive.cpp
     GoDeskUpdateDialog.cpp
+    GoDeskDataPathWidget.cpp
     )
 
 set(HEADER_FILES
@@ -44,6 +45,7 @@ set(HEADER_FILES
     Recent/RecentDatabase.h
     FrmActive.h
     GoDeskUpdateDialog.h
+    GoDeskDataPathWidget.h
     )
 
 set(SOURCE_UI_FILES
