@@ -97,7 +97,8 @@ Name "$(LANG_PRODUCT_NAME) ${PRODUCT_VERSION}"
 Caption "$(LANG_PRODUCT_NAME) ${PRODUCT_VERSION}"
 OutFile "${PRODUCT_NAME}_Setup_${PRODUCT_VERSION}.exe"
 InstallDir "$LOCALAPPDATA\${PRODUCT_NAME}"
-;InstallDirRegKey ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_DIR_REGKEY}" ""
+; Reuse the directory selected by the user for upgrades and silent updates.
+InstallDirRegKey ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_DIR_REGKEY}" "Path"
 
 ShowInstDetails show
 ShowUnInstDetails show
@@ -254,6 +255,7 @@ Section -Post
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_DIR_REGKEY}" "Path" "$INSTDIR\"
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayName" "$(^Name)"
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "UninstallString" "$INSTDIR\uninst.exe"
+  WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "InstallLocation" "$INSTDIR"
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayIcon" "$INSTDIR\bin\${PRODUCT_APP_NAME}.exe"
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayVersion" "${PRODUCT_VERSION}"
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "URLInfoAbout" "${PRODUCT_WEB_SITE}"
@@ -305,7 +307,16 @@ Section Uninstall
   SetOutPath "$SMPROGRAMS"
   Delete "$DESKTOP\$(LANG_PRODUCT_NAME).lnk"
   Delete "$DESKTOP\$(LANG_PRODUCT_NAME_CONFIGURE).lnk"
-  RMDIR /r "$INSTDIR"
+  ; Keep v0.1.13 user data.  The application data root is allowed to live
+  ; below $INSTDIR\data, so remove packaged directories explicitly instead of
+  ; recursively deleting the whole installation root.
+  RMDir /r "$INSTDIR\bin"
+  RMDir /r "$INSTDIR\etc"
+  RMDir /r "$INSTDIR\share"
+  RMDir /r "$INSTDIR\plugins"
+  RMDir /r "$INSTDIR\lib"
+  Delete "$INSTDIR\*.*"
+  RMDir "$INSTDIR"
   ;SetShellVarContext current
 
   DeleteRegKey ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}"

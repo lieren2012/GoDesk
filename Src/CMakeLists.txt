@@ -82,6 +82,7 @@ list(APPEND PLUGIN_HEADER_FILES
     Unix/DesktopShortcuts.h
     ParameterCompone/ParameterPluginUI.h
     StatsAppUsage.h
+    GoDeskDataPaths.h
     )
 
 list(APPEND PLUGIN_SOURCE_FILES
@@ -130,6 +131,7 @@ list(APPEND PLUGIN_SOURCE_FILES
     Hook.cpp
     Unix/DesktopShortcuts.cpp
     StatsAppUsage.cpp
+    GoDeskDataPaths.cpp
     CheckBoxHeader.cpp
     Database/Database.cpp
     Database/DatabaseTree.cpp

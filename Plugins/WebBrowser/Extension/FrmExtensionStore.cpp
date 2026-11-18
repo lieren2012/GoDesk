@@ -31,6 +31,7 @@
 #include "FrmExtensionStore.h"
 #include "FrmExtensionManager.h"
 #include "ParameterWebBrowser.h"
+#include "GoDeskDataPaths.h"
 #include "ui_FrmExtensionStore.h"
 
 static Q_LOGGING_CATEGORY(log, "WebBrowser.ExtensionStore")
@@ -660,8 +661,11 @@ QString CFrmExtensionStore::GetDownloadPath() const
 
 QString CFrmExtensionStore::GetCachePath() const
 {
-    QString path = QStandardPaths::writableLocation(QStandardPaths::CacheLocation)
-                   + "/ExtensionStore";
+    GoDeskDataPaths& paths = GoDeskDataPaths::instance();
+    if (paths.dataRoot().isEmpty())
+        paths.initialize();
+    QString path = QDir(paths.cacheRoot())
+                   .filePath(QStringLiteral("ExtensionStore"));
     
     QDir dir;
     if(!dir.exists(path)) {

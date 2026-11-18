@@ -8,6 +8,7 @@
 
 #include "ParameterUI.h"
 #include "ParameterDlgSettings.h"
+#include "GoDeskDataPathWidget.h"
 #include "ui_ParameterDlgSettings.h"
 
 #ifdef HAVE_ICE
@@ -23,6 +24,12 @@ CParameterDlgSettings::CParameterDlgSettings(CParameterApp *pPara,
     m_pParameters(pPara)
 {
     ui->setupUi(this);
+
+    auto* dataPathScroll = new QScrollArea(ui->tabWidget);
+    dataPathScroll->setWidgetResizable(true);
+    auto* dataPathWidget = new GoDeskDataPathWidget;
+    dataPathScroll->setWidget(dataPathWidget);
+    ui->tabWidget->addTab(dataPathScroll, tr("数据目录"));
 
 #ifdef HAVE_ICE
     QWidget* pWidget = CICE::Instance()->GetParameterWidget(this);

@@ -15,9 +15,10 @@
 #include <QProgressBar>
 #include <QPushButton>
 #include <QRegularExpression>
-#include <QStandardPaths>
 #include <QTimer>
 #include <QVBoxLayout>
+
+#include "GoDeskDataPaths.h"
 
 namespace {
 const QUrl kGoDeskReleaseApi(
@@ -260,9 +261,8 @@ void GoDeskUpdateDialog::UpdateDetails()
         source += tr("\nRelease：%1").arg(m_ReleaseUrl.toString());
     m_SourceLabel->setText(source);
     m_FileLabel->setText(m_DownloadFileName);
-    const QString plannedPath = QDir(
-        QStandardPaths::writableLocation(QStandardPaths::TempLocation))
-        .filePath(QStringLiteral("GoDesk") + QDir::separator() + m_DownloadFileName);
+    const QString plannedPath = QDir(GoDeskDataPaths::instance().updateRoot())
+        .filePath(m_DownloadFileName);
     m_PathLabel->setText(m_DownloadPath.isEmpty() ? plannedPath : m_DownloadPath);
     m_Sha256Label->setText(m_ExpectedSha256.isEmpty()
                                ? tr("下载后计算")
@@ -274,16 +274,13 @@ void GoDeskUpdateDialog::slotDownloadClicked()
     if (!m_DownloadUrl.isValid() || m_DownloadFileName.isEmpty())
         return;
 
-    const QString tempRoot = QStandardPaths::writableLocation(QStandardPaths::TempLocation);
-    QDir directory(tempRoot);
-    if (!directory.mkpath(QStringLiteral("GoDesk"))) {
-        SetError(tr("无法创建更新临时目录。"));
+    QDir directory(GoDeskDataPaths::instance().updateRoot());
+    if (!directory.exists() && !directory.mkpath(QStringLiteral("."))) {
+        SetError(tr("无法创建更新下载目录。"));
         return;
     }
 
-    m_DownloadPath = directory.filePath(QStringLiteral("GoDesk")
-                                        + QDir::separator()
-                                        + m_DownloadFileName);
+    m_DownloadPath = directory.filePath(m_DownloadFileName);
     m_DownloadFile.setFileName(m_DownloadPath);
     if (!m_DownloadFile.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
         SetError(tr("无法写入下载文件：%1").arg(m_DownloadPath));

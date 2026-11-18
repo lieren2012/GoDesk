@@ -43,6 +43,7 @@
 #include "ParameterGlobal.h"
 #include "ProtocolManager.h"
 #include "FrmWebBrowser.h"
+#include "GoDeskDataPaths.h"
 
 static Q_LOGGING_CATEGORY(log, "WebBrowser.Browser")
 CFrmWebBrowser::CFrmWebBrowser(CParameterWebBrowser *pPara,
@@ -479,6 +480,18 @@ QWebEngineProfile* CFrmWebBrowser::GetProfile(bool offTheRecord)
         return QWebEngineProfile::defaultProfile();
 
     set.setValue("Profile/Name", name);
+
+    GoDeskDataPaths& paths = GoDeskDataPaths::instance();
+    if (paths.dataRoot().isEmpty())
+        paths.initialize();
+    const QString persistentPath = QDir(paths.dataStoreRoot())
+        .filePath(QStringLiteral("webengine"));
+    const QString cachePath = QDir(paths.cacheRoot())
+        .filePath(QStringLiteral("webengine"));
+    QDir().mkpath(persistentPath);
+    QDir().mkpath(cachePath);
+    m_profile->setPersistentStoragePath(persistentPath);
+    m_profile->setCachePath(cachePath);
 
     m_profile->settings()->setAttribute(QWebEngineSettings::PluginsEnabled, true);
     m_profile->settings()->setAttribute(QWebEngineSettings::DnsPrefetchEnabled, true);
